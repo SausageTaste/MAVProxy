@@ -299,6 +299,7 @@ class MPState(object):
             MPSetting('vehicle_name', str, '', 'Vehicle Name', tab='Vehicle'),
 
             MPSetting('sys_status_error_warn_interval', int, 30, 'interval to warn of autopilot software failure'),
+            MPSetting('forward_ap_statustext', bool, False, 'forward AP status text packets to downstream links'),
 
             MPSetting('inhibit_screensaver_when_armed', bool, False, 'inhibit screensaver while vehicle armed'),
 

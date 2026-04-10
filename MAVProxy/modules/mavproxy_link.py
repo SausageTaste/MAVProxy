@@ -984,6 +984,12 @@ class LinkModule(mp_module.MPModule):
         for ot in self.outstanding_timesyncs:
             ot.handle_TIMESYNC(m, master)
 
+    def should_forward_message(self, m):
+        '''return True if a message should be forwarded to downstream links'''
+        if m.get_type() == 'STATUSTEXT' and not self.settings.forward_ap_statustext:
+            return False
+        return True
+
     def mavlink_packet(self, msg):
         '''handle an incoming mavlink packet'''
         pass
@@ -1003,7 +1009,8 @@ class LinkModule(mp_module.MPModule):
 
         # see if it is handled by a specialised sysid connection
         if sysid in self.mpstate.sysid_outputs:
-            self.mpstate.sysid_outputs[sysid].write(m.get_msgbuf())
+            if self.should_forward_message(m):
+                self.mpstate.sysid_outputs[sysid].write(m.get_msgbuf())
             if mtype == "GLOBAL_POSITION_INT":
                 for modname in 'map', 'asterix', 'NMEA', 'NMEA2':
                     mod = self.module(modname)
@@ -1018,7 +1025,8 @@ class LinkModule(mp_module.MPModule):
         if mtype == 'GLOBAL_POSITION_INT':
             # send GLOBAL_POSITION_INT to 2nd GCS for 2nd vehicle display
             for sysid in self.mpstate.sysid_outputs:
-                self.mpstate.sysid_outputs[sysid].write(m.get_msgbuf())
+                if self.should_forward_message(m):
+                    self.mpstate.sysid_outputs[sysid].write(m.get_msgbuf())
 
             if self.mpstate.settings.fwdpos:
                 for link in self.mpstate.mav_master:
@@ -1073,7 +1081,7 @@ class LinkModule(mp_module.MPModule):
             # would lead a conflict in stream rate setting between mavproxy and the other
             # GCS
             if self.mpstate.settings.mavfwd_rate or mtype != 'REQUEST_DATA_STREAM':
-                if mtype not in self.no_fwd_types:
+                if mtype not in self.no_fwd_types and self.should_forward_message(m):
                     for r in self.mpstate.mav_outputs:
                         if hasattr(r, 'ws') and r.ws is not None:
                             from wsproto.connection import ConnectionState
