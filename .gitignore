@@ -18,3 +18,5 @@ windows/version.txt
 /.vscode
 /.idea
 /mav.parm
+/.python-version
+/uv.lock

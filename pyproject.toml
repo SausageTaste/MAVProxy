@@ -1,0 +1,15 @@
+[project]
+name = "mavproxy"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Sungmin Woo", email = "woos8899@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "pymavlink>=2.4.14",
+    "pyserial>=3.0",
+    "numpy",
+    "gnureadline",
+]
